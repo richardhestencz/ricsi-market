@@ -1,0 +1,536 @@
+<meta charset="utf-8">
+<title>Ricsi-market</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Ricsi-market — a haverok boltja. Élelmiszer, háztartás, középső sor. Rendelés pár kattintással.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FCFCFA; --card:#FFFFFF; --shelf:#F3F3EC; --line:#E5E5DB;
+  --ink:#17180F; --ink-2:#5C5F4E; --ink-3:#8E927E;
+  --tag:#F5C400; --tag-ink:#17180F; --tag-edge:#D9AC00;
+  --fresh:#10693D; --fresh-ink:#FFFFFF; --fresh-soft:#E6F1EA;
+  --alert:#B3341B;
+  --sh-sm:0 1px 2px rgba(23,24,15,.05), 0 2px 6px rgba(23,24,15,.04);
+  --sh:0 16px 40px rgba(23,24,15,.16);
+  --mono:'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#12130E; --card:#1A1C15; --shelf:#22241B; --line:#2E3126;
+  --ink:#EFF0E8; --ink-2:#A9AD9B; --ink-3:#787C6B;
+  --tag:#F5C400; --tag-ink:#17180F; --tag-edge:#B98F00;
+  --fresh:#3FA972; --fresh-ink:#0B1810; --fresh-soft:#16301F;
+  --alert:#E8785E;
+  --sh-sm:0 1px 2px rgba(0,0,0,.5); --sh:0 16px 40px rgba(0,0,0,.6);
+}}
+:root[data-theme="light"]{
+  --paper:#FCFCFA; --card:#FFFFFF; --shelf:#F3F3EC; --line:#E5E5DB;
+  --ink:#17180F; --ink-2:#5C5F4E; --ink-3:#8E927E;
+  --tag:#F5C400; --tag-ink:#17180F; --tag-edge:#D9AC00;
+  --fresh:#10693D; --fresh-ink:#FFFFFF; --fresh-soft:#E6F1EA;
+  --alert:#B3341B;
+  --sh-sm:0 1px 2px rgba(23,24,15,.05), 0 2px 6px rgba(23,24,15,.04);
+  --sh:0 16px 40px rgba(23,24,15,.16);
+}
+:root[data-theme="dark"]{
+  --paper:#12130E; --card:#1A1C15; --shelf:#22241B; --line:#2E3126;
+  --ink:#EFF0E8; --ink-2:#A9AD9B; --ink-3:#787C6B;
+  --tag:#F5C400; --tag-ink:#17180F; --tag-edge:#B98F00;
+  --fresh:#3FA972; --fresh-ink:#0B1810; --fresh-soft:#16301F;
+  --alert:#E8785E;
+  --sh-sm:0 1px 2px rgba(0,0,0,.5); --sh:0 16px 40px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font:400 15px/1.5 'Schibsted Grotesk', system-ui, -apple-system, sans-serif;
+  -webkit-text-size-adjust:100%; -webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;padding:0}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--fresh);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(14px,3vw,28px)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ── fejléc ── */
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 93%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:12px;padding:12px 0}
+.brand{margin-right:auto;display:flex;align-items:center;gap:9px;min-width:0}
+.mark{background:var(--tag);color:var(--tag-ink);font-weight:800;font-size:15px;letter-spacing:-.02em;
+  padding:5px 9px;border-radius:4px;box-shadow:inset 0 -2px 0 var(--tag-edge);white-space:nowrap;flex:none}
+.brand .txt{min-width:0}
+.brand .txt b{display:block;font-weight:800;font-size:17px;letter-spacing:-.025em;line-height:1.1}
+.brand .txt span{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.search{position:relative;flex:1 1 260px;max-width:400px}
+.search input{width:100%;padding:10px 14px 10px 36px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);font-size:14.5px}
+.search input::placeholder{color:var(--ink-3)}
+.search input:focus{border-color:var(--ink);outline:none}
+.search .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:13px;pointer-events:none}
+.basket{display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);font-weight:700;font-size:14px;
+  padding:10px 15px;border-radius:8px;white-space:nowrap}
+.basket .n{font-family:var(--mono);background:var(--tag);color:var(--tag-ink);border-radius:4px;min-width:22px;padding:1px 5px;font-size:12.5px;text-align:center;font-weight:500}
+.basket.bump{animation:bump .28s ease}
+@keyframes bump{40%{transform:scale(1.07)}100%{transform:scale(1)}}
+
+/* ── sorok (kategóriák) ── */
+nav.aisles{border-bottom:1px solid var(--line);background:var(--paper)}
+.arow{display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+.arow::-webkit-scrollbar{display:none}
+.aisle{padding:6px 12px;border-radius:6px;border:1.5px solid var(--line);background:var(--card);
+  font-size:13.5px;font-weight:600;color:var(--ink-2);white-space:nowrap;transition:.14s}
+.aisle:hover{border-color:var(--ink-3);color:var(--ink)}
+.aisle[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ── polcszegély-csík ── */
+.shelfstrip{display:flex;flex-wrap:wrap;gap:6px 24px;padding:13px 0;margin-top:16px;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);letter-spacing:.01em}
+.shelfstrip b{color:var(--ink);font-weight:500}
+
+/* ── polccímkék (termékek) ── */
+main{padding-bottom:100px}
+.sec{padding-top:30px}
+.sec h2{margin:0 0 13px;font-size:18px;font-weight:800;letter-spacing:-.025em;display:flex;align-items:baseline;gap:10px}
+.sec h2 em{font-family:var(--mono);font-style:normal;font-size:11.5px;font-weight:400;color:var(--ink-3);letter-spacing:.02em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(163px,1fr));gap:11px}
+.p{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:11px;display:flex;flex-direction:column;transition:border-color .14s, box-shadow .14s}
+.p:hover{border-color:var(--ink-3);box-shadow:var(--sh-sm)}
+.p .tile{background:var(--shelf);border-radius:6px;height:88px;display:grid;place-items:center;font-size:40px;line-height:1;margin-bottom:10px;user-select:none}
+.p .nm{font-weight:600;font-size:14px;line-height:1.28;letter-spacing:-.01em}
+.p .un{font-family:var(--mono);color:var(--ink-3);font-size:11.5px;margin-top:2px}
+.p .bot{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:auto;padding-top:11px}
+.price{display:inline-block;background:var(--tag);color:var(--tag-ink);font-weight:800;font-size:15px;letter-spacing:-.02em;
+  padding:4px 8px;border-radius:4px;box-shadow:inset 0 -2px 0 var(--tag-edge);font-variant-numeric:tabular-nums;white-space:nowrap}
+.upr{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;white-space:nowrap}
+.add{width:36px;height:36px;border-radius:7px;background:var(--fresh);color:var(--fresh-ink);display:grid;place-items:center;
+  font-size:20px;font-weight:700;line-height:1;flex:none;transition:.14s}
+.add:hover{filter:brightness(1.12)}
+.add:active{transform:scale(.93)}
+.qty{display:flex;align-items:center;background:var(--fresh);color:var(--fresh-ink);border-radius:7px;height:36px;padding:0 3px;flex:none}
+.qty button{width:28px;height:28px;display:grid;place-items:center;font-size:17px;font-weight:700;border-radius:5px;color:inherit}
+.qty button:hover{background:rgba(255,255,255,.22)}
+.qty .v{font-family:var(--mono);min-width:22px;text-align:center;font-size:13.5px;font-weight:500}
+.noresult{padding:60px 20px;text-align:center;color:var(--ink-3);border:1.5px dashed var(--line);border-radius:10px;margin-top:30px}
+.noresult b{display:block;color:var(--ink);font-size:16px;margin-bottom:5px}
+
+/* ── blokk (kosár) ── */
+#scrim{position:fixed;inset:0;background:rgba(12,14,8,.45);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s}
+#scrim.on{opacity:1;pointer-events:auto}
+#cart{position:fixed;z-index:90;top:0;right:0;bottom:0;width:min(408px,100%);background:var(--card);box-shadow:var(--sh);
+  display:flex;flex-direction:column;transform:translateX(102%);transition:transform .26s cubic-bezier(.2,.8,.25,1)}
+#cart.on{transform:none}
+@media (max-width:640px){
+  #cart{top:auto;left:0;width:auto;max-height:88dvh;border-radius:14px 14px 0 0;transform:translateY(103%)}
+  #cart.on{transform:none}
+}
+.chead{flex:none;padding:15px 18px 13px;border-bottom:1px dashed var(--line);display:flex;align-items:flex-start;gap:10px}
+.chead .t{margin-right:auto}
+.chead .t b{display:block;font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
+.chead .t span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.08em;margin-top:3px}
+.x{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font-size:16px;color:var(--ink-2);flex:none}
+.x:hover{background:var(--shelf)}
+.cbody{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:4px 18px 16px}
+.li{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px dashed var(--line)}
+.li .e{width:40px;height:40px;border-radius:6px;background:var(--shelf);display:grid;place-items:center;font-size:20px;flex:none}
+.li .i{flex:1;min-width:0}
+.li .i b{display:block;font-weight:600;font-size:13.5px;line-height:1.25}
+.li .i span{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
+.li .r{text-align:right;flex:none}
+.li .r .s{font-family:var(--mono);font-size:13.5px;font-weight:500;white-space:nowrap}
+.li .r .qty{margin-top:6px;height:28px}
+.li .r .qty button{width:24px;height:24px;font-size:15px}
+.cfoot{flex:none;border-top:2px solid var(--ink);padding:13px 18px 17px;background:var(--card)}
+.trow{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);padding:3px 0}
+.trow.tot{color:var(--ink);font-family:'Schibsted Grotesk',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.025em;
+  font-variant-numeric:tabular-nums;padding-top:9px;margin-top:7px;border-top:1px dashed var(--line)}
+.cta{display:block;width:100%;margin-top:12px;background:var(--fresh);color:var(--fresh-ink);font-weight:700;font-size:15px;
+  padding:14px;border-radius:8px;text-align:center;transition:.14s}
+.cta:hover{filter:brightness(1.1)}
+.cta[disabled]{opacity:.5;cursor:progress}
+.cta.ghost{background:transparent;color:var(--ink-2);border:1.5px solid var(--line);margin-top:7px;font-weight:600}
+.cta.ghost:hover{background:var(--shelf);color:var(--ink);filter:none}
+
+/* ── űrlap ── */
+.f{display:flex;flex-direction:column;gap:11px;padding:6px 0 4px}
+.fld label{display:block;font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink-2);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.fld input,.fld textarea{width:100%;padding:11px 12px;border-radius:7px;border:1.5px solid var(--line);background:var(--paper);font-size:14.5px}
+.fld input:focus,.fld textarea:focus{border-color:var(--ink);outline:none;background:var(--card)}
+.fld textarea{resize:vertical;min-height:60px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.seg button{padding:10px 8px;border-radius:7px;border:1.5px solid var(--line);background:var(--card);font-size:13.5px;font-weight:600;color:var(--ink-2);line-height:1.3}
+.seg button small{display:block;font-family:var(--mono);font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:3px}
+.seg button[aria-pressed="true"]{border-color:var(--fresh);background:var(--fresh-soft);color:var(--fresh)}
+.seg button[aria-pressed="true"] small{color:var(--fresh)}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);line-height:1.55;margin:2px 0 0}
+.err{background:color-mix(in srgb,var(--alert) 11%,transparent);color:var(--alert);border-radius:7px;padding:10px 12px;font-size:13px;line-height:1.45}
+.err a{color:inherit;font-weight:700}
+
+/* ── nyugta (visszaigazolás) ── */
+.rcpt{text-align:center;padding:22px 6px 8px}
+.rcpt .stamp{display:inline-block;border:2.5px solid var(--fresh);color:var(--fresh);border-radius:6px;
+  font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.18em;padding:7px 14px;transform:rotate(-3deg)}
+.rcpt h4{margin:16px 0 6px;font-size:19px;font-weight:800;letter-spacing:-.025em}
+.rcpt p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.55}
+.rcpt .id{display:block;font-family:var(--mono);font-size:12.5px;color:var(--ink-3);letter-spacing:.1em;margin-top:16px;
+  padding-top:14px;border-top:1px dashed var(--line)}
+.empty{text-align:center;padding:40px 10px}
+.empty .big{font-size:40px;line-height:1}
+.empty h4{margin:12px 0 5px;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.empty p{margin:0;color:var(--ink-3);font-size:13.5px;line-height:1.5}
+
+footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 0 34px;color:var(--ink-3);
+  font-family:var(--mono);font-size:11px;letter-spacing:.02em;display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between}
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,14px);background:var(--ink);color:var(--paper);
+  padding:10px 17px;border-radius:8px;font-size:13.5px;font-weight:600;box-shadow:var(--sh);opacity:0;pointer-events:none;
+  transition:.2s;z-index:120;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header>
+  <div class="wrap hrow">
+    <div class="brand">
+      <span class="mark">RM</span>
+      <span class="txt"><b>Ricsi-market</b><span>a haverok boltja</span></span>
+    </div>
+    <div class="search">
+      <span class="ico">🔍</span>
+      <input id="q" type="search" placeholder="Mit keresel?" aria-label="Keresés a termékek között">
+    </div>
+    <button class="basket" id="opencart" aria-label="Kosár megnyitása">Kosár <span class="n" id="cartn">0</span></button>
+  </div>
+</header>
+
+<nav class="aisles"><div class="wrap"><div class="arow" id="arow"></div></div></nav>
+
+<main class="wrap">
+  <div class="shelfstrip">
+    <span>🚚 <b>Kiszállítás 1 980 Ft</b> — 30 000 Ft felett ingyen</span>
+    <span>🕓 <b>Aznap</b>, ha 16:00 előtt rendelsz</span>
+    <span>💵 <b>Fizetés átvételkor</b></span>
+  </div>
+  <div id="results"></div>
+  <div class="noresult" id="noresult" hidden><b>Ilyet nem tartunk 🤷</b>Próbálj rákeresni másra, vagy nézd végig a sorokat.</div>
+</main>
+
+<footer class="wrap">
+  <span>RICSI-MARKET · BUDAPEST · A HAVEROKNAK</span>
+  <span>KÉRDÉS? SZÓLJ RICSINEK</span>
+</footer>
+
+<div id="scrim"></div>
+<aside id="cart" role="dialog" aria-modal="true" aria-label="Kosár">
+  <div class="chead">
+    <span class="t"><b id="ctitle">Kosár</b><span id="csub">Ricsi-market · Budapest</span></span>
+    <button class="x" id="closecart" aria-label="Bezárás">✕</button>
+  </div>
+  <div class="cbody" id="cbody"></div>
+  <div class="cfoot" id="cfoot"></div>
+</aside>
+<div id="toast" role="status"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   BEÁLLÍTÁS — ide érkezik a rendelés e-mailben.
+   Az első rendelés után a FormSubmit küld egy aktiváló levelet:
+   kattints benne a linkre, és onnantól minden rendelés megérkezik.
+   ══════════════════════════════════════════════════════════════════ */
+const ORDER_TO = "ruglaktokon@gmail.com";
+const SHOP_NAME = "Ricsi-market";
+const DELIVERY_FEE = 1980, FREE_OVER = 30000;
+
+const CATS = [
+ {id:'pek', n:'Pékáru', items:[
+  ['Fehér kenyér','1 kg',1298,'🍞'],['Félbarna kenyér','750 g',1198,'🥖'],['Kifli','5 db',490,'🥐'],
+  ['Zsemle','5 db',490,'🥯'],['Croissant','2 db',998,'🥐'],['Kakaós csiga','1 db',798,'🍥'],
+  ['Toast kenyér','500 g',1098,'🍞'],['Bagett','250 g',698,'🥖']]},
+ {id:'tej', n:'Tejtermék & tojás', items:[
+  ['Tej 2,8%','1 l',898,'🥛'],['Tartós tej 1,5%','1 l',778,'🥛'],['Trappista sajt','1 kg',6980,'🧀'],
+  ['Mozzarella','125 g',1098,'🧀'],['Tejföl 20%','330 g',1098,'🥣'],['Görög joghurt','150 g',698,'🍶'],
+  ['Vaj 82%','250 g',2598,'🧈'],['Túró','250 g',1298,'🧀'],['Sajtkrém','200 g',1398,'🧀'],
+  ['Kefir','500 g',938,'🥛'],['Tojás M','10 db',2298,'🥚']]},
+ {id:'hus', n:'Hús & hal', items:[
+  ['Csirkemell filé','1 kg',5598,'🍗'],['Csirkecomb','1 kg',3198,'🍗'],['Sertéskaraj','1 kg',4998,'🥩'],
+  ['Darált sertés','500 g',2998,'🥩'],['Marhalábszár','1 kg',7980,'🥩'],['Pulykamell','1 kg',5980,'🦃'],
+  ['Lazacfilé','250 g',4580,'🐟'],['Halrudacska','300 g',2398,'🐠']]},
+ {id:'felv', n:'Felvágott & hűtött', items:[
+  ['Sonka, szeletelt','100 g',1098,'🍖'],['Szalámi','100 g',1298,'🍖'],['Virsli','500 g',2598,'🌭'],
+  ['Bacon','200 g',1998,'🥓'],['Házi kolbász','1 kg',6980,'🌭'],['Párizsi','100 g',598,'🍖']]},
+ {id:'zold', n:'Zöldség & gyümölcs', items:[
+  ['Burgonya','2 kg',1798,'🥔'],['Vöröshagyma','1 kg',1098,'🧅'],['Fokhagyma','200 g',1398,'🧄'],
+  ['Paradicsom','1 kg',2398,'🍅'],['Kaliforniai paprika','1 kg',2980,'🫑'],['Kígyóuborka','1 db',598,'🥒'],
+  ['Sárgarépa','1 kg',1198,'🥕'],['Fejes saláta','1 db',898,'🥬'],['Alma','1 kg',1598,'🍎'],
+  ['Banán','1 kg',1798,'🍌'],['Narancs','1 kg',1798,'🍊'],['Citrom','500 g',1498,'🍋'],
+  ['Szőlő','500 g',1998,'🍇'],['Eper','500 g',2980,'🍓'],['Csiperkegomba','250 g',1198,'🍄'],
+  ['Avokádó','1 db',1198,'🥑'],['Görögdinnye','1 kg',898,'🍉'],['Brokkoli','500 g',1598,'🥦']]},
+ {id:'alap', n:'Alapvető élelmiszer', items:[
+  ['Spagetti','500 g',898,'🍝'],['Fusilli tészta','500 g',898,'🍝'],['Rizs','1 kg',1798,'🍚'],
+  ['Liszt BL55','1 kg',898,'🌾'],['Kristálycukor','1 kg',1198,'🍬'],['Só','1 kg',498,'🧂'],
+  ['Napraforgó olaj','1 l',1898,'🫗'],['Olívaolaj','500 ml',4980,'🫒'],['Ecet','1 l',698,'🧴'],
+  ['Paradicsomkonzerv','400 g',898,'🥫'],['Csemegekukorica','340 g',798,'🌽'],['Bab konzerv','400 g',898,'🫘'],
+  ['Tonhal konzerv','160 g',1598,'🐟'],['Baracklekvár','350 g',1498,'🍑'],['Akácméz','500 g',3980,'🍯'],
+  ['Mogyorókrém','400 g',3380,'🥜'],['Müzli','500 g',2398,'🥣'],['Zabpehely','500 g',1098,'🌾'],
+  ['Ketchup','450 g',1298,'🍅'],['Majonéz','400 g',1798,'🥚'],['Mustár','450 g',1098,'🌭'],
+  ['Fűszerpaprika','100 g',1798,'🌶️'],['Leveskocka','60 g',898,'🍲']]},
+ {id:'edes', n:'Édesség & snack', items:[
+  ['Tejcsokoládé','100 g',1098,'🍫'],['Étcsoki 70%','100 g',1398,'🍫'],['Vajas keksz','200 g',898,'🍪'],
+  ['Ostya','180 g',1098,'🧇'],['Gumicukor','200 g',1198,'🍬'],['Sós chips','150 g',1598,'🥔'],
+  ['Sós mogyoró','200 g',1798,'🥜'],['Sós rúd','200 g',898,'🥨'],['Mikrós popcorn','100 g',698,'🍿'],
+  ['Jégkrém','4 db',2980,'🍦'],['Rágógumi','30 g',898,'🍬']]},
+ {id:'fagy', n:'Fagyasztott', items:[
+  ['Zöldborsó','450 g',1298,'🫛'],['Zöldségkeverék','450 g',1398,'🥦'],['Hasábburgonya','1 kg',1998,'🍟'],
+  ['Pizza margherita','350 g',2380,'🍕'],['Fagyasztott málna','300 g',2580,'🫐'],['Rántott sajt','300 g',2780,'🧀']]},
+ {id:'ital', n:'Italok', items:[
+  ['Ásványvíz, szénsavas','1,5 l',398,'💧'],['Ásványvíz, mentes','1,5 l',398,'💧'],['Cola','2 l',1498,'🥤'],
+  ['Narancslé 100%','1 l',1798,'🧃'],['Almalé','1 l',1298,'🧃'],['Energiaital','250 ml',898,'⚡'],
+  ['Világos sör','0,5 l',798,'🍺'],['Vörösbor','0,75 l',4980,'🍷'],['Fehérbor','0,75 l',4580,'🥂'],
+  ['Pezsgő','0,75 l',5980,'🍾'],['Szódavíz','1 l',598,'🫧']]},
+ {id:'kave', n:'Kávé & tea', items:[
+  ['Őrölt kávé','250 g',3380,'☕'],['Kávékapszula','10 db',3780,'☕'],['Instant kávé','100 g',3980,'☕'],
+  ['Fekete tea','20 filter',1498,'🍵'],['Gyümölcstea','20 filter',1398,'🍵'],['Kakaópor','200 g',1998,'🍫']]},
+ {id:'hazt', n:'Háztartás & tisztítás', items:[
+  ['Mosogatószer','1 l',1798,'🧴'],['Mosókapszula','20 db',4980,'🧺'],['Öblítő','1 l',2380,'🧺'],
+  ['Felmosószer','1 l',1598,'🪣'],['WC-tisztító','750 ml',1398,'🚽'],['Mosogatószivacs','5 db',898,'🧽'],
+  ['Szemeteszsák','20 db',1498,'🗑️'],['Alufólia','20 m',1298,'🥡'],['Papírtörlő','2 tekercs',1598,'🧻'],
+  ['Toalettpapír','8 tekercs',2980,'🧻'],['Mosogatógép-tabletta','30 db',5980,'🍽️'],['Gyertya','4 db',1398,'🕯️']]},
+ {id:'drog', n:'Drogéria', items:[
+  ['Tusfürdő','400 ml',1998,'🧴'],['Sampon','400 ml',2380,'🧴'],['Fogkrém','75 ml',1798,'🪥'],
+  ['Fogkefe','2 db',1598,'🪥'],['Dezodor','150 ml',1998,'💨'],['Kézkrém','100 ml',1498,'🧴'],
+  ['Borotvahab','200 ml',2380,'🪒'],['Papírzsebkendő','100 db',1098,'🤧'],['Szappan','100 g',698,'🧼']]},
+ {id:'baba', n:'Bébi & állat', items:[
+  ['Pelenka 4-es','44 db',7980,'👶'],['Bébiétel','190 g',1098,'🍼'],['Nedves törlőkendő','72 db',1398,'🧻'],
+  ['Kutyatáp','3 kg',6980,'🐶'],['Macskaeledel','100 g',498,'🐱'],['Macskaalom','5 l',2580,'🐈']]},
+ {id:'kozep', n:'Középső sor', items:[
+  ['Akkus fúrógép 18V','1 db',49980,'🔩'],['Bluetooth fejhallgató','1 db',25980,'🎧'],['Robotporszívó','1 db',99980,'🤖'],
+  ['Air fryer 5 l','1 db',59980,'🍳'],['Presszó kávéfőző','1 db',79980,'☕'],['Gőzölős vasaló','1 db',25980,'👔'],
+  ['Kerti szék','1 db',19980,'🪑'],['Faszenes grill','1 db',29980,'🔥'],['Szerszámkészlet','100 db',17980,'🧰'],
+  ['Sporttáska','1 db',13980,'🎒'],['Futócipő','1 pár',25980,'👟'],['Termosz','750 ml',9980,'🍶'],
+  ['Sátor, 3 személyes','1 db',49980,'⛺'],['Elektromos fogkefe','1 db',19980,'🪥'],['Konyhai mérleg','1 db',8980,'⚖️'],
+  ['Serpenyő 28 cm','1 db',15980,'🍳'],['Ágyneműhuzat szett','1 db',17980,'🛏️'],['LED asztali lámpa','1 db',11980,'💡'],
+  ['Kerékpáros lámpa','1 db',6980,'🚲'],['Úszószemüveg','1 db',5980,'🥽']]},
+];
+
+/* ── termékek + egységár ── */
+const P = [];
+CATS.forEach(c => c.items.forEach((it, k) => P.push({
+  id: c.id + '-' + k, cat: c.id, catName: c.n, name: it[0], unit: it[1], price: it[2], emoji: it[3]
+})));
+function unitPrice(p){
+  const m = p.unit.match(/^([\d.,]+)\s*(kg|g|l|ml|db|pár|tekercs|filter|m)?\b/i);
+  if (!m) return null;
+  let v = parseFloat(m[1].replace(',','.'));
+  let u = (m[2] || 'db').toLowerCase();
+  if (!v) return null;
+  if (u === 'g'){ v /= 1000; u = 'kg'; }
+  if (u === 'ml'){ v /= 1000; u = 'l'; }
+  if (u === 'db' && v === 1) return null;
+  if (u === 'pár') return null;
+  return Math.round(p.price / v).toLocaleString('hu-HU').replace(/ /g,' ') + ' Ft/' + u;
+}
+
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return (this.m||{})[k] ?? d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ (this.m ??= {})[k] = v; } }
+};
+let cart = store.get('rm_cart', {});
+let aisle = 'all', query = '', mode = 'delivery', view = 'cart';
+
+const $ = s => document.querySelector(s);
+const ft = n => n.toLocaleString('hu-HU').replace(/ /g,' ') + ' Ft';
+const byId = id => P.find(p => p.id === id);
+const lines = () => Object.entries(cart).filter(([,q]) => q > 0).map(([id,q]) => ({ p: byId(id), q })).filter(x => x.p);
+const subtotal = () => lines().reduce((s,l) => s + l.p.price * l.q, 0);
+const fee = () => (mode === 'pickup' || subtotal() === 0 || subtotal() >= FREE_OVER) ? 0 : DELIVERY_FEE;
+const count = () => lines().reduce((s,l) => s + l.q, 0);
+
+/* ── sorok ── */
+$('#arow').innerHTML = `<button class="aisle" data-a="all" aria-pressed="true">Minden</button>` +
+  CATS.map(c => `<button class="aisle" data-a="${c.id}" aria-pressed="false">${c.n}</button>`).join('');
+$('#arow').addEventListener('click', e => {
+  const b = e.target.closest('.aisle'); if (!b) return;
+  aisle = b.dataset.a;
+  $('#arow').querySelectorAll('.aisle').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderProducts();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+$('#q').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); renderProducts(); });
+
+/* ── polccímkék ── */
+function card(p){
+  const q = cart[p.id] || 0, up = unitPrice(p);
+  return `<article class="p">
+    <div class="tile" aria-hidden="true">${p.emoji}</div>
+    <div class="nm">${p.name}</div>
+    <div class="un">${p.unit}</div>
+    <div class="bot">
+      <div><span class="price">${ft(p.price)}</span>${up ? `<div class="upr">${up}</div>` : ''}</div>
+      ${q ? `<span class="qty" data-id="${p.id}">
+          <button data-d="-1" aria-label="${p.name}: eggyel kevesebb">−</button>
+          <span class="v">${q}</span>
+          <button data-d="1" aria-label="${p.name}: eggyel több">+</button>
+        </span>`
+        : `<button class="add" data-add="${p.id}" aria-label="${p.name} kosárba">+</button>`}
+    </div>
+  </article>`;
+}
+function renderProducts(){
+  const hit = p => (aisle === 'all' || p.cat === aisle) &&
+    (!query || p.name.toLowerCase().includes(query) || p.catName.toLowerCase().includes(query));
+  const list = P.filter(hit);
+  $('#noresult').hidden = list.length > 0;
+  $('#results').innerHTML = CATS.filter(c => list.some(p => p.cat === c.id)).map(c => {
+    const items = list.filter(p => p.cat === c.id);
+    return `<section class="sec"><h2>${c.n} <em>${items.length} féle</em></h2>
+      <div class="grid">${items.map(card).join('')}</div></section>`;
+  }).join('');
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-add]');
+  if (a){
+    cart[a.dataset.add] = (cart[a.dataset.add] || 0) + 1;
+    sync(); toast(byId(a.dataset.add).name + ' bekerült');
+    const b = $('#opencart'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+    return;
+  }
+  const s = e.target.closest('.qty button');
+  if (s){
+    const id = s.closest('.qty').dataset.id;
+    cart[id] = Math.max(0, (cart[id] || 0) + (+s.dataset.d));
+    if (!cart[id]) delete cart[id];
+    sync();
+  }
+});
+
+/* ── blokk ── */
+function sync(){
+  store.set('rm_cart', cart);
+  $('#cartn').textContent = count();
+  renderProducts();
+  if (view === 'cart') renderCart(); else if (view === 'form') renderForm();
+}
+function renderCart(){
+  view = 'cart';
+  $('#ctitle').textContent = 'Kosár'; $('#csub').textContent = 'Ricsi-market · Budapest';
+  const L = lines();
+  if (!L.length){
+    $('#cbody').innerHTML = `<div class="empty"><div class="big">🧺</div>
+      <h4>Üres a kosár</h4><p>Járd végig a sorokat, és tedd bele a <b>+</b> gombbal, amit szeretnél.</p></div>`;
+    $('#cfoot').innerHTML = `<button class="cta ghost" data-close>Vissza a polcokhoz</button>`;
+    return;
+  }
+  $('#cbody').innerHTML = L.map(l => `<div class="li">
+      <span class="e" aria-hidden="true">${l.p.emoji}</span>
+      <span class="i"><b>${l.p.name}</b><span>${l.p.unit} · ${ft(l.p.price)}</span></span>
+      <span class="r"><span class="s">${ft(l.p.price * l.q)}</span>
+        <span class="qty" data-id="${l.p.id}">
+          <button data-d="-1" aria-label="eggyel kevesebb">−</button><span class="v">${l.q}</span><button data-d="1" aria-label="eggyel több">+</button>
+        </span></span>
+    </div>`).join('');
+  const sub = subtotal(), f = fee();
+  $('#cfoot').innerHTML = `
+    <div class="trow"><span>${count()} tétel</span><span>${ft(sub)}</span></div>
+    <div class="trow"><span>Kiszállítás</span><span>${f ? ft(f) : 'ingyenes'}</span></div>
+    ${(mode === 'delivery' && sub < FREE_OVER) ? `<div class="trow"><span>Ingyenes szállításig</span><span>${ft(FREE_OVER - sub)}</span></div>` : ''}
+    <div class="trow tot"><span>Összesen</span><span>${ft(sub + f)}</span></div>
+    <button class="cta" data-checkout>Tovább a rendeléshez</button>`;
+}
+function renderForm(){
+  view = 'form';
+  $('#ctitle').textContent = 'Rendelés'; $('#csub').textContent = 'add meg, hova vigyük';
+  const d = store.get('rm_me', {});
+  $('#cbody').innerHTML = `<div class="f">
+    <div class="seg">
+      <button data-mode="delivery" aria-pressed="${mode === 'delivery'}">Kiszállítás<small>${subtotal() >= FREE_OVER ? 'ingyenes' : ft(DELIVERY_FEE)}</small></button>
+      <button data-mode="pickup" aria-pressed="${mode === 'pickup'}">Átveszem<small>ingyenes</small></button>
+    </div>
+    <div class="fld"><label for="fn">Neved</label><input id="fn" value="${d.name || ''}" placeholder="Kovács Béla" autocomplete="name"></div>
+    <div class="fld"><label for="fp">Telefonszám</label><input id="fp" value="${d.phone || ''}" placeholder="+36 30 123 4567" inputmode="tel" autocomplete="tel"></div>
+    ${mode === 'delivery' ? `<div class="fld"><label for="fa">Cím</label><input id="fa" value="${d.addr || ''}" placeholder="Budapest, Példa utca 1." autocomplete="street-address"></div>` : ''}
+    <div class="fld"><label for="fm">Megjegyzés</label><textarea id="fm" placeholder="Mikorra kell, melyik csengő, bármi."></textarea></div>
+    <div id="formerr"></div>
+    <p class="hint">A rendelés e-mailben megy Ricsihez. Fizetés átvételkor.</p>
+  </div>`;
+  const sub = subtotal(), f = fee();
+  $('#cfoot').innerHTML = `
+    <div class="trow"><span>${count()} tétel</span><span>${ft(sub)}</span></div>
+    <div class="trow"><span>Kiszállítás</span><span>${f ? ft(f) : 'ingyenes'}</span></div>
+    <div class="trow tot"><span>Fizetendő</span><span>${ft(sub + f)}</span></div>
+    <button class="cta" id="send">Megrendelem</button>
+    <button class="cta ghost" data-back>Vissza a kosárhoz</button>`;
+}
+const orderText = () => lines().map(l => `${l.q}× ${l.p.name} (${l.p.unit}) — ${ft(l.p.price * l.q)}`).join('\n');
+
+async function send(){
+  const name = $('#fn').value.trim(), phone = $('#fp').value.trim();
+  const addr = mode === 'delivery' ? ($('#fa')?.value.trim() || '') : 'Személyes átvétel';
+  const note = $('#fm').value.trim();
+  const missing = [];
+  if (name.length < 2) missing.push('a neved');
+  if (phone.replace(/\D/g,'').length < 7) missing.push('egy jó telefonszám');
+  if (mode === 'delivery' && addr.length < 5) missing.push('a cím');
+  if (missing.length){ $('#formerr').innerHTML = `<div class="err">Ez még hiányzik: ${missing.join(', ')}.</div>`; return; }
+  store.set('rm_me', { name, phone, addr: mode === 'delivery' ? addr : '' });
+
+  const id = 'RM-' + String(Date.now()).slice(-6);
+  const sub = subtotal(), f = fee();
+  const btn = $('#send'); btn.disabled = true; btn.textContent = 'Küldés…';
+  const payload = {
+    _subject: `🛒 Új rendelés — ${SHOP_NAME} (${id})`, _template: 'table', _captcha: 'false',
+    Rendelésszám: id, Név: name, Telefon: phone,
+    Átvétel: mode === 'delivery' ? 'Kiszállítás' : 'Személyes átvétel',
+    Cím: addr, Megjegyzés: note || '—', Tételek: orderText(),
+    Részösszeg: ft(sub), Szállítás: f ? ft(f) : 'ingyenes', Végösszeg: ft(sub + f)
+  };
+  try{
+    const r = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(ORDER_TO), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    done(id, sub + f);
+  }catch(err){
+    btn.disabled = false; btn.textContent = 'Megrendelem';
+    const body = encodeURIComponent(`Rendelés: ${id}\nNév: ${name}\nTelefon: ${phone}\nÁtvétel: ${payload.Átvétel}\nCím: ${addr}\nMegjegyzés: ${note || '—'}\n\n${orderText()}\n\nVégösszeg: ${ft(sub + f)}`);
+    $('#formerr').innerHTML = `<div class="err">Az automatikus küldés most nem sikerült, de a rendelés összeállt.
+      <a href="mailto:${ORDER_TO}?subject=${encodeURIComponent('Rendelés ' + id + ' — ' + SHOP_NAME)}&body=${body}">Küldd el e-mailben egy kattintással →</a></div>`;
+  }
+}
+function done(id, total){
+  view = 'done';
+  $('#ctitle').textContent = 'Köszönjük'; $('#csub').textContent = 'a rendelés elment';
+  $('#cbody').innerHTML = `<div class="rcpt">
+    <span class="stamp">ELKÜLDVE</span>
+    <h4>Ricsi megkapta</h4>
+    <p>A rendelés e-mailben megérkezett hozzá.<br>Hamarosan keres a megadott számon.</p>
+    <span class="id">${id} · ${ft(total)}</span></div>`;
+  $('#cfoot').innerHTML = `<button class="cta" data-new>Új rendelés</button>`;
+  cart = {}; store.set('rm_cart', cart);
+  $('#cartn').textContent = '0'; renderProducts();
+}
+
+/* ── nyitás/zárás ── */
+const openCart = () => { $('#cart').classList.add('on'); $('#scrim').classList.add('on'); if (view !== 'done') renderCart(); };
+const closeCart = () => { $('#cart').classList.remove('on'); $('#scrim').classList.remove('on'); if (view === 'done') view = 'cart'; };
+$('#opencart').onclick = openCart;
+$('#closecart').onclick = closeCart;
+$('#scrim').onclick = closeCart;
+addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+$('#cart').addEventListener('click', e => {
+  if (e.target.closest('[data-close]')) return closeCart();
+  if (e.target.closest('[data-checkout]')) return renderForm();
+  if (e.target.closest('[data-back]')) return renderCart();
+  if (e.target.closest('[data-new]')) { view = 'cart'; return renderCart(); }
+  if (e.target.closest('#send')) return send();
+  const m = e.target.closest('[data-mode]');
+  if (m){ mode = m.dataset.mode; renderForm(); }
+});
+let tt;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 1700); }
+
+$('#cartn').textContent = count();
+renderProducts();
+renderCart();
+</script>
