@@ -17,7 +17,7 @@ A fájl tetején, a `<script>` elején:
 ```js
 const ORDER_TO = "ruglaktokon@gmail.com";   // ide jön a rendelés
 const REVTAG   = "hrichard";                // fizetés: revolut.me/hrichard
-const DELIVERY_FEE = 1980, FREE_OVER = 30000;
+const DELIVERY_FEE = 1980;                  // kiszállítás — mindig, ingyen nincs
 ```
 
 **Fizetés:** csak Revolut. A sikeres rendelés után a vevő egy

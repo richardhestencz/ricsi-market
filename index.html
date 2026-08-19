@@ -221,7 +221,7 @@ footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 0 34px;colo
 
 <main class="wrap">
   <div class="shelfstrip">
-    <span>🚚 <b>Kiszállítás 1 980 Ft</b> — 30 000 Ft felett ingyen</span>
+    <span>🚚 <b>Kiszállítás 1 980 Ft</b> — mindig, kivétel nincs 😌</span>
     <span>🕓 <b>Aznap</b>, ha 16:00 előtt rendelsz</span>
     <span>💳 <b>Fizetés: csak Revolut</b></span>
   </div>
@@ -254,8 +254,8 @@ footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 0 34px;colo
 const ORDER_TO = "ruglaktokon@gmail.com";
 const REVTAG = "hrichard";   // fizetés ide: revolut.me/hrichard
 const SHOP_NAME = "Ricsi-market";
-const DELIVERY_FEE = 1980, FREE_OVER = 30000;
-const REV_LINK = t => `https://revolut.me/${REVTAG}?amount=${t}&currency=HUF`;
+const DELIVERY_FEE = 1980;
+const REV_LINK = t => `https://revolut.me/${REVTAG}?amount=${t * 100}&currency=HUF`; // a Revolut századokban kéri
 
 const CATS = [
  {id:'pek', n:'Pékáru', items:[
@@ -358,7 +358,7 @@ const ft = n => n.toLocaleString('hu-HU').replace(/ /g,' ') + ' Ft';
 const byId = id => P.find(p => p.id === id);
 const lines = () => Object.entries(cart).filter(([,q]) => q > 0).map(([id,q]) => ({ p: byId(id), q })).filter(x => x.p);
 const subtotal = () => lines().reduce((s,l) => s + l.p.price * l.q, 0);
-const fee = () => (mode === 'pickup' || subtotal() === 0 || subtotal() >= FREE_OVER) ? 0 : DELIVERY_FEE;
+const fee = () => (mode === 'pickup' || subtotal() === 0) ? 0 : DELIVERY_FEE;
 const count = () => lines().reduce((s,l) => s + l.q, 0);
 
 /* ── sorok ── */
@@ -448,7 +448,6 @@ function renderCart(){
   $('#cfoot').innerHTML = `
     <div class="trow"><span>${count()} tétel</span><span>${ft(sub)}</span></div>
     <div class="trow"><span>Kiszállítás</span><span>${f ? ft(f) : 'ingyenes'}</span></div>
-    ${(mode === 'delivery' && sub < FREE_OVER) ? `<div class="trow"><span>Ingyenes szállításig</span><span>${ft(FREE_OVER - sub)}</span></div>` : ''}
     <div class="trow tot"><span>Összesen</span><span>${ft(sub + f)}</span></div>
     <button class="cta" data-checkout>Tovább a rendeléshez</button>`;
 }
@@ -458,7 +457,7 @@ function renderForm(){
   const d = store.get('rm_me', {});
   $('#cbody').innerHTML = `<div class="f">
     <div class="seg">
-      <button data-mode="delivery" aria-pressed="${mode === 'delivery'}">Kiszállítás<small>${subtotal() >= FREE_OVER ? 'ingyenes' : ft(DELIVERY_FEE)}</small></button>
+      <button data-mode="delivery" aria-pressed="${mode === 'delivery'}">Kiszállítás<small>${ft(DELIVERY_FEE)}</small></button>
       <button data-mode="pickup" aria-pressed="${mode === 'pickup'}">Átveszem<small>ingyenes</small></button>
     </div>
     <div class="fld"><label for="fn">Neved</label><input id="fn" value="${d.name || ''}" placeholder="Kovács Béla" autocomplete="name"></div>
