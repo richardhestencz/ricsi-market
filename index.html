@@ -1,7 +1,8 @@
 <meta charset="utf-8">
 <title>Ricsi-market</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Ricsi-market — a haverok boltja. Élelmiszer, háztartás, középső sor. Rendelés pár kattintással.">
+<meta name="description" content="Ricsi-market — a haverok boltja. Élelmiszer, háztartás, középső sor. Rendelés pár kattintással, fizetés Revoluttal.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><g transform="rotate(-8 22 22)"><path d="M14 9h19q6 0 6 6v14q0 6-6 6H14L4 22z" fill="%23F5C400" stroke="%23D9AC00" stroke-width="1.6"/><circle cx="11" cy="22" r="2.7" fill="white" stroke="%23D9AC00"/><text x="27" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="800" fill="%2317180F">R</text></g></svg>'>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -57,8 +58,8 @@ input,textarea{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 93%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .hrow{display:flex;align-items:center;gap:12px;padding:12px 0}
 .brand{margin-right:auto;display:flex;align-items:center;gap:9px;min-width:0}
-.mark{background:var(--tag);color:var(--tag-ink);font-weight:800;font-size:15px;letter-spacing:-.02em;
-  padding:5px 9px;border-radius:4px;box-shadow:inset 0 -2px 0 var(--tag-edge);white-space:nowrap;flex:none}
+.logo{flex:none;display:block;width:42px;height:42px}
+.logo text{font:800 16px 'Schibsted Grotesk',Arial,sans-serif}
 .brand .txt{min-width:0}
 .brand .txt b{display:block;font-weight:800;font-size:17px;letter-spacing:-.025em;line-height:1.1}
 .brand .txt span{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
@@ -175,6 +176,12 @@ main{padding-bottom:100px}
 .rcpt p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.55}
 .rcpt .id{display:block;font-family:var(--mono);font-size:12.5px;color:var(--ink-3);letter-spacing:.1em;margin-top:16px;
   padding-top:14px;border-top:1px dashed var(--line)}
+.ref{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:14.5px;letter-spacing:.1em;
+  border:1.5px dashed var(--ink-3);border-radius:7px;padding:8px 15px;color:var(--ink);transition:.14s}
+.ref:hover{border-color:var(--ink);background:var(--shelf)}
+a.cta{text-decoration:none}
+.cta.rev{background:var(--ink);color:var(--paper)}
+.cta.rev:hover{filter:none;opacity:.86}
 .empty{text-align:center;padding:40px 10px}
 .empty .big{font-size:40px;line-height:1}
 .empty h4{margin:12px 0 5px;font-size:17px;font-weight:800;letter-spacing:-.02em}
@@ -192,7 +199,14 @@ footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 0 34px;colo
 <header>
   <div class="wrap hrow">
     <div class="brand">
-      <span class="mark">RM</span>
+      <svg class="logo" viewBox="0 0 44 44" role="img" aria-label="Ricsi-market logó">
+        <g transform="rotate(-8 22 22)">
+          <path d="M14 9h19q6 0 6 6v14q0 6-6 6H14L4 22z" fill="var(--tag)" stroke="var(--tag-edge)" stroke-width="1.6"/>
+          <circle cx="11" cy="22" r="2.7" fill="var(--paper)" stroke="var(--tag-edge)"/>
+          <path d="M10 19.5q-5-6 2-10" fill="none" stroke="var(--ink)" stroke-width="1.7" stroke-linecap="round"/>
+          <text x="27" y="28" text-anchor="middle" fill="var(--tag-ink)">R</text>
+        </g>
+      </svg>
       <span class="txt"><b>Ricsi-market</b><span>a haverok boltja</span></span>
     </div>
     <div class="search">
@@ -209,14 +223,14 @@ footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 0 34px;colo
   <div class="shelfstrip">
     <span>🚚 <b>Kiszállítás 1 980 Ft</b> — 30 000 Ft felett ingyen</span>
     <span>🕓 <b>Aznap</b>, ha 16:00 előtt rendelsz</span>
-    <span>💵 <b>Fizetés átvételkor</b></span>
+    <span>💳 <b>Fizetés: csak Revolut</b></span>
   </div>
   <div id="results"></div>
   <div class="noresult" id="noresult" hidden><b>Ilyet nem tartunk 🤷</b>Próbálj rákeresni másra, vagy nézd végig a sorokat.</div>
 </main>
 
 <footer class="wrap">
-  <span>RICSI-MARKET · BUDAPEST · A HAVEROKNAK</span>
+  <span>RICSI-MARKET · BUDAPEST · FIZETÉS: REVOLUT</span>
   <span>KÉRDÉS? SZÓLJ RICSINEK</span>
 </footer>
 
@@ -238,8 +252,10 @@ footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 0 34px;colo
    kattints benne a linkre, és onnantól minden rendelés megérkezik.
    ══════════════════════════════════════════════════════════════════ */
 const ORDER_TO = "ruglaktokon@gmail.com";
+const REVTAG = "hrichard";   // fizetés ide: revolut.me/hrichard
 const SHOP_NAME = "Ricsi-market";
 const DELIVERY_FEE = 1980, FREE_OVER = 30000;
+const REV_LINK = t => `https://revolut.me/${REVTAG}?amount=${t}&currency=HUF`;
 
 const CATS = [
  {id:'pek', n:'Pékáru', items:[
@@ -450,7 +466,7 @@ function renderForm(){
     ${mode === 'delivery' ? `<div class="fld"><label for="fa">Cím</label><input id="fa" value="${d.addr || ''}" placeholder="Budapest, Példa utca 1." autocomplete="street-address"></div>` : ''}
     <div class="fld"><label for="fm">Megjegyzés</label><textarea id="fm" placeholder="Mikorra kell, melyik csengő, bármi."></textarea></div>
     <div id="formerr"></div>
-    <p class="hint">A rendelés e-mailben megy Ricsihez. Fizetés átvételkor.</p>
+    <p class="hint">A rendelés e-mailben megy Ricsihez. Fizetni csak Revoluttal lehet — a küldés után rögtön kapod a fizetős linket.</p>
   </div>`;
   const sub = subtotal(), f = fee();
   $('#cfoot').innerHTML = `
@@ -480,7 +496,7 @@ async function send(){
     _subject: `🛒 Új rendelés — ${SHOP_NAME} (${id})`, _template: 'table', _captcha: 'false',
     Rendelésszám: id, Név: name, Telefon: phone,
     Átvétel: mode === 'delivery' ? 'Kiszállítás' : 'Személyes átvétel',
-    Cím: addr, Megjegyzés: note || '—', Tételek: orderText(),
+    Cím: addr, Fizetés: `Revolut (revolut.me/${REVTAG}) · várt közlemény: ${id}`, Megjegyzés: note || '—', Tételek: orderText(),
     Részösszeg: ft(sub), Szállítás: f ? ft(f) : 'ingyenes', Végösszeg: ft(sub + f)
   };
   try{
@@ -495,18 +511,22 @@ async function send(){
     btn.disabled = false; btn.textContent = 'Megrendelem';
     const body = encodeURIComponent(`Rendelés: ${id}\nNév: ${name}\nTelefon: ${phone}\nÁtvétel: ${payload.Átvétel}\nCím: ${addr}\nMegjegyzés: ${note || '—'}\n\n${orderText()}\n\nVégösszeg: ${ft(sub + f)}`);
     $('#formerr').innerHTML = `<div class="err">Az automatikus küldés most nem sikerült, de a rendelés összeállt.
-      <a href="mailto:${ORDER_TO}?subject=${encodeURIComponent('Rendelés ' + id + ' — ' + SHOP_NAME)}&body=${body}">Küldd el e-mailben egy kattintással →</a></div>`;
+      <a href="mailto:${ORDER_TO}?subject=${encodeURIComponent('Rendelés ' + id + ' — ' + SHOP_NAME)}&body=${body}">Küldd el e-mailben egy kattintással →</a>
+      · utána <a href="${REV_LINK(sub + f)}" target="_blank" rel="noopener">fizess Revoluttal →</a></div>`;
   }
 }
 function done(id, total){
   view = 'done';
-  $('#ctitle').textContent = 'Köszönjük'; $('#csub').textContent = 'a rendelés elment';
+  $('#ctitle').textContent = 'Köszönjük'; $('#csub').textContent = 'már csak a fizetés van hátra';
   $('#cbody').innerHTML = `<div class="rcpt">
     <span class="stamp">ELKÜLDVE</span>
-    <h4>Ricsi megkapta</h4>
-    <p>A rendelés e-mailben megérkezett hozzá.<br>Hamarosan keres a megadott számon.</p>
+    <h4>Ricsi megkapta a rendelést</h4>
+    <p>Fizetni Revoluttal tudsz a lenti gombbal.<br>A közleménybe ezt írd (koppints rá a másoláshoz):</p>
+    <button class="ref" data-copy="${id}" title="Másolás">${id}</button>
     <span class="id">${id} · ${ft(total)}</span></div>`;
-  $('#cfoot').innerHTML = `<button class="cta" data-new>Új rendelés</button>`;
+  $('#cfoot').innerHTML = `
+    <a class="cta rev" href="${REV_LINK(total)}" target="_blank" rel="noopener">Fizetés Revoluttal · ${ft(total)} ↗</a>
+    <button class="cta ghost" data-new>Új rendelés</button>`;
   cart = {}; store.set('rm_cart', cart);
   $('#cartn').textContent = '0'; renderProducts();
 }
@@ -519,6 +539,8 @@ $('#closecart').onclick = closeCart;
 $('#scrim').onclick = closeCart;
 addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
 $('#cart').addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy]');
+  if (cp){ (navigator.clipboard?.writeText(cp.dataset.copy) || Promise.reject()).then(() => toast('Közlemény kimásolva ✓')).catch(() => toast(cp.dataset.copy)); return; }
   if (e.target.closest('[data-close]')) return closeCart();
   if (e.target.closest('[data-checkout]')) return renderForm();
   if (e.target.closest('[data-back]')) return renderCart();

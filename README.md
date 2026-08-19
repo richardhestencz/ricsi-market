@@ -2,7 +2,7 @@
 
 A haverok boltja — egyetlen `index.html`, semmi build, semmi függőség.
 
-**Élő oldal:** https://<felhasznalonev>.github.io/ricsi-market/
+**Élő oldal:** https://richardhestencz.github.io/ricsi-market/
 
 ## Mi ez
 
@@ -16,8 +16,14 @@ A fájl tetején, a `<script>` elején:
 
 ```js
 const ORDER_TO = "ruglaktokon@gmail.com";   // ide jön a rendelés
+const REVTAG   = "hrichard";                // fizetés: revolut.me/hrichard
 const DELIVERY_FEE = 1980, FREE_OVER = 30000;
 ```
+
+**Fizetés:** csak Revolut. A sikeres rendelés után a vevő egy
+„Fizetés Revoluttal" gombot kap (revolut.me link a végösszeggel),
+a közleménybe pedig a rendelésszám kerül — így az e-mailben érkező
+rendelést könnyű párosítani a beérkező utalással.
 
 **Az első rendelés aktiválja a címet:** miután valaki először megrendel valamit,
 a FormSubmit küld egy levelet — a benne lévő linkre kattintva élesedik.
